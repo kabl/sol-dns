@@ -12,10 +12,22 @@ contract DnsDB {
      event eventDnsDB_newEntry(bytes32 dnsName, bytes32 entry);
 
 
-     function register(bytes32 dnsName, bytes32 entry) {
+     function register(bytes32 dnsName, bytes32 entry) returns (bool success) {
 
         dnsEntriesByName[dnsName] = DnsEntry(msg.sender, entry);
         eventDnsDB_newEntry(dnsName, entry);
+
+        success = true;
+     }
+
+     function deleteEntryByName(bytes32 name) returns (bool success){
+        if(dnsEntriesByName[name].owner != address(0x0)){
+            delete dnsEntriesByName[name].owner;
+            delete dnsEntriesByName[name];
+            success = true;
+        }else{
+            success = false;
+        }
      }
 
      function getEntryByName(bytes32 name) constant returns (bytes32 entry){

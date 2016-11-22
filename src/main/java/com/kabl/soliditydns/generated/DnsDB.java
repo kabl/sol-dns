@@ -36,10 +36,22 @@ public final class DnsDB extends Contract {
             + "     event eventDnsDB_newEntry(bytes32 dnsName, bytes32 entry);\n"
             + "\n"
             + "\n"
-            + "     function register(bytes32 dnsName, bytes32 entry) {\n"
+            + "     function register(bytes32 dnsName, bytes32 entry) returns (bool success) {\n"
             + "\n"
             + "        dnsEntriesByName[dnsName] = DnsEntry(msg.sender, entry);\n"
             + "        eventDnsDB_newEntry(dnsName, entry);\n"
+            + "\n"
+            + "        success = true;\n"
+            + "     }\n"
+            + "\n"
+            + "     function deleteEntryByName(bytes32 name) returns (bool success){\n"
+            + "        if(dnsEntriesByName[name].owner != address(0x0)){\n"
+            + "            delete dnsEntriesByName[name].owner;\n"
+            + "            delete dnsEntriesByName[name];\n"
+            + "            success = true;\n"
+            + "        }else{\n"
+            + "            success = false;\n"
+            + "        }\n"
             + "     }\n"
             + "\n"
             + "     function getEntryByName(bytes32 name) constant returns (bytes32 entry){\n"
@@ -64,6 +76,11 @@ public final class DnsDB extends Contract {
                 Arrays.<Type>asList(name), 
                 Arrays.<TypeReference<?>>asList(new TypeReference<Bytes32>() {}));
         return executeCallSingleValueReturnAsync(function);
+    }
+
+    public Future<TransactionReceipt> deleteEntryByName(Bytes32 name) {
+        Function function = new Function("deleteEntryByName", Arrays.<Type>asList(name), Collections.<TypeReference<?>>emptyList());
+        return executeTransactionAsync(function);
     }
 
     public EventValues processEventDnsDB_newEntryEvent(TransactionReceipt transactionReceipt) {

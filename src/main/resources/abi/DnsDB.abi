@@ -12,7 +12,12 @@
       }
     ],
     "name": "register",
-    "outputs": [],
+    "outputs": [
+      {
+        "name": "success",
+        "type": "bool"
+      }
+    ],
     "payable": false,
     "type": "function"
   },
@@ -29,6 +34,24 @@
       {
         "name": "entry",
         "type": "bytes32"
+      }
+    ],
+    "payable": false,
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "name",
+        "type": "bytes32"
+      }
+    ],
+    "name": "deleteEntryByName",
+    "outputs": [
+      {
+        "name": "success",
+        "type": "bool"
       }
     ],
     "payable": false,
