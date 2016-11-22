@@ -6,3 +6,9 @@ simpleDnsInstance.getIpByName("google.com");
 
 simpleDnsInstance.registerName("demo.ch", "1.1.1.1", {from: eth.accounts[0]});
 ```
+
+# TO-DO
+- [ ] dnsDB self destruct functionality (other contract. Use as modifier)
+- [ ] CMC (Contract Managing Contract) Bootstrapping dnsDB
+- [ ] dnsDB self destruct only callable by CMC
+- [ ] CMC Owner Ship Management
