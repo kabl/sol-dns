@@ -5,29 +5,30 @@
  */
 package com.kabl.soliditydns;
 
-import com.kabl.soliditydns.generated.DnsDB;
-import java.math.BigInteger;
+import com.kabl.soliditydns.generated.DnsManager;
 import org.web3j.abi.datatypes.generated.Bytes32;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.abi.datatypes.Address;
 
-public class DnsDbWrapper {
-    
+public class DnsManagerWrapper {
+
     private static final int TX_WAIT_MAX_SEC = 120;
 
-    private final DnsDB dnsDB;
+    private final DnsManager dnsManager;
 
-    public DnsDbWrapper(DnsDB dnsDB) {
-        this.dnsDB = dnsDB;
+    public DnsManagerWrapper(DnsManager dnsManager) {
+        this.dnsManager = dnsManager;
     }
 
     public void register(String name, String value) {
         try {
-            Future<TransactionReceipt> txRec = dnsDB.register(ContractUtil.toBytes32(name), ContractUtil.toBytes32(value));
+            Future<TransactionReceipt> txRec = dnsManager.register(ContractUtil.toBytes32(name), ContractUtil.toBytes32(value));
             BigInteger blockNumber = txRec.get(TX_WAIT_MAX_SEC, TimeUnit.SECONDS).getBlockNumber();
 
             if (!value.equals(getEntryByName(name))) {
@@ -41,7 +42,7 @@ public class DnsDbWrapper {
 
     public void deleteEntryByName(String name) {
         try {
-            Future<TransactionReceipt> txRec = dnsDB.deleteEntryByName(ContractUtil.toBytes32(name));
+            Future<TransactionReceipt> txRec = dnsManager.deleteEntryByName(ContractUtil.toBytes32(name));
             BigInteger blockNumber = txRec.get(TX_WAIT_MAX_SEC, TimeUnit.SECONDS).getBlockNumber();
 
             if (!"404".equals(getEntryByName(name))) {
@@ -55,11 +56,32 @@ public class DnsDbWrapper {
 
     public String getEntryByName(String name) {
         try {
-            Future<Bytes32> future = dnsDB.getEntryByName(ContractUtil.toBytes32(name));
+            Future<Bytes32> future = dnsManager.getEntryByName(ContractUtil.toBytes32(name));
             byte[] value = future.get(10, TimeUnit.SECONDS).getValue();
             return ContractUtil.toString(value);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
+    public String getCmcAddress() {
+        try {
+            Future<Address> future = dnsManager.getCmcAddress();
+            BigInteger address = future.get(10, TimeUnit.SECONDS).getValue();
+            return "0x" + address.toString(16);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String getContract(String name) {
+        try {
+            Future<Address> future = dnsManager.getContract(ContractUtil.toBytes32(name));
+            BigInteger address = future.get(10, TimeUnit.SECONDS).getValue();
+            return "0x" + address.toString(16);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

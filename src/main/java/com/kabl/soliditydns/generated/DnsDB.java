@@ -8,6 +8,7 @@ import java.util.concurrent.Future;
 import org.web3j.abi.Contract;
 import org.web3j.abi.EventValues;
 import org.web3j.abi.TypeReference;
+import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.Event;
 import org.web3j.abi.datatypes.Function;
 import org.web3j.abi.datatypes.Type;
@@ -24,8 +25,10 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 public final class DnsDB extends Contract {
     private static final String BINARY = "pragma solidity ^0.4.2;\n"
             + "\n"
-            + "contract DnsDB {\n"
+            + "import \"./CmcEnabled.sol\";\n"
             + "\n"
+            + "contract DnsDB is CmcEnabled {\n"
+            + "    \n"
             + "     struct DnsEntry\n"
             + "     {\n"
             + "         address owner;\n"
@@ -35,8 +38,7 @@ public final class DnsDB extends Contract {
             + "     mapping (bytes32 => DnsEntry) dnsEntriesByName;\n"
             + "     event eventDnsDB_newEntry(bytes32 dnsName, bytes32 entry);\n"
             + "\n"
-            + "\n"
-            + "     function register(bytes32 dnsName, bytes32 entry) returns (bool success) {\n"
+            + "     function register(bytes32 dnsName, bytes32 entry) callAllowed returns (bool success)  {\n"
             + "\n"
             + "        dnsEntriesByName[dnsName] = DnsEntry(msg.sender, entry);\n"
             + "        eventDnsDB_newEntry(dnsName, entry);\n"
@@ -44,7 +46,7 @@ public final class DnsDB extends Contract {
             + "        success = true;\n"
             + "     }\n"
             + "\n"
-            + "     function deleteEntryByName(bytes32 name) returns (bool success){\n"
+            + "     function deleteEntryByName(bytes32 name) callAllowed returns (bool success) {\n"
             + "        if(dnsEntriesByName[name].owner != address(0x0)){\n"
             + "            delete dnsEntriesByName[name].owner;\n"
             + "            delete dnsEntriesByName[name];\n"
@@ -54,7 +56,7 @@ public final class DnsDB extends Contract {
             + "        }\n"
             + "     }\n"
             + "\n"
-            + "     function getEntryByName(bytes32 name) constant returns (bytes32 entry){\n"
+            + "     function getEntryByName(bytes32 name) callAllowed constant returns (bytes32 entry) {\n"
             + "         if(dnsEntriesByName[name].owner != address(0x0))\n"
             + "             return dnsEntriesByName[name].entry;\n"
             + "         else\n"
@@ -64,6 +66,20 @@ public final class DnsDB extends Contract {
 
     private DnsDB(String contractAddress, Web3j web3j, Credentials credentials, BigInteger gasPrice, BigInteger gasLimit) {
         super(contractAddress, web3j, credentials, gasPrice, gasLimit);
+    }
+
+    public Future<Address> getCmcAddress() {
+        Function function = new Function("getCmcAddress", 
+                Arrays.<Type>asList(), 
+                Arrays.<TypeReference<?>>asList(new TypeReference<Address>() {}));
+        return executeCallSingleValueReturnAsync(function);
+    }
+
+    public Future<Address> getSeniorContract() {
+        Function function = new Function("getSeniorContract", 
+                Arrays.<Type>asList(), 
+                Arrays.<TypeReference<?>>asList(new TypeReference<Address>() {}));
+        return executeCallSingleValueReturnAsync(function);
     }
 
     public Future<TransactionReceipt> register(Bytes32 dnsName, Bytes32 entry) {
@@ -80,6 +96,16 @@ public final class DnsDB extends Contract {
 
     public Future<TransactionReceipt> deleteEntryByName(Bytes32 name) {
         Function function = new Function("deleteEntryByName", Arrays.<Type>asList(name), Collections.<TypeReference<?>>emptyList());
+        return executeTransactionAsync(function);
+    }
+
+    public Future<TransactionReceipt> remove() {
+        Function function = new Function("remove", Arrays.<Type>asList(), Collections.<TypeReference<?>>emptyList());
+        return executeTransactionAsync(function);
+    }
+
+    public Future<TransactionReceipt> init(Address _cmcAddress, Address _seniorContract) {
+        Function function = new Function("init", Arrays.<Type>asList(_cmcAddress, _seniorContract), Collections.<TypeReference<?>>emptyList());
         return executeTransactionAsync(function);
     }
 

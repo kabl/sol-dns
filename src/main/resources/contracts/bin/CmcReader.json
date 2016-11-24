@@ -1,0 +1,18 @@
+{
+    "abi": "[{\"constant\":true,\"inputs\":[{\"name\":\"name\",\"type\":\"bytes32\"}],\"name\":\"getContract\",\"outputs\":[{\"name\":\"_address\",\"type\":\"address\"}],\"payable\":false,\"type\":\"function\"}]\n",
+    "bytecode": "6060604052604b8060106000396000f3606060405260e060020a6000350463e16c7d988114601c575b6002565b3460025760006040805173ffffffffffffffffffffffffffffffffffffffff9092168252519081900360200190f3",
+    "functionHashes": {
+        "getContract(bytes32)": "e16c7d98"
+    },
+    "gasEstimates": {
+        "creation": [
+            45,
+            15000
+        ],
+        "external": {
+            "getContract(bytes32)": 150
+        },
+        "internal": {}
+    },
+    "runtimeBytecode": "606060405260e060020a6000350463e16c7d988114601c575b6002565b3460025760006040805173ffffffffffffffffffffffffffffffffffffffff9092168252519081900360200190f3"
+}

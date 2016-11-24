@@ -7,16 +7,20 @@ public class CodeGenerator {
     public static void main(String[] args) throws Exception {
 
         System.out.println("Generate the code!");
-        String contract = "./src/main/resources/contracts/DnsDB.sol";
-        String abi = "./src/main/resources/abi/DnsDB.abi";
-        
+
+        create("DnsManager.sol", "DnsManager.abi");
+        create("Cmc.sol", "Cmc.abi");
+        create("DnsDB.sol", "DnsDB.abi");
+    }
+
+    private static void create(String contractSource, String abi) throws Exception {
         String[] args2 = {
-            contract,
-            abi,
-            "-p",
-            "com.kabl.soliditydns.generated",
-            "-o",
-            "./src/main/java",};
+                "./src/main/resources/contracts/" + contractSource,
+                "./src/main/resources/contracts/bin/" + abi,
+                "-p",
+                "com.kabl.soliditydns.generated",
+                "-o",
+                "./src/main/java",};
 
         SolidityFunctionWrapperGenerator.main(args2);
     }
