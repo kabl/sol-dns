@@ -1,7 +1,7 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.4;
 
 import "./CmcEnabled.sol";
-import "./DnsManager.sol";
+import "./SolDnsApp.sol";  //required because bootstrap
 
 contract CmcReader {
   function getContract(bytes32 name) constant returns (address _address) {}
@@ -23,21 +23,21 @@ contract Cmc is CmcReader{
         owner = msg.sender;
     }
 
-    function bootstrap() onlyOwner returns (bool result){
-        DnsManager dnsManager = new DnsManager();
+    function bootstrap() onlyOwner returns (bool _result){
+        SolDnsApp solDnsApp = new SolDnsApp();
         DnsDB dnsdb = new DnsDB();
 
-        if(!addContract("dnsmanager", dnsManager, 0x0))
+        if(!addContract("soldnsapp", solDnsApp, 0x0))
             return false;
         
-        if(!addContract("dnsdb", dnsdb, "dnsmanager"))
+        if(!addContract("dnsdb", dnsdb, "soldnsapp"))
             return false;
 
         return true;
     }
 
     // Add a new contract to CMC. This will overwrite an existing contract.
-    function addContract(bytes32 name, address addr, bytes32 seniorName) onlyOwner returns (bool result) {
+    function addContract(bytes32 name, address addr, bytes32 seniorName) onlyOwner returns (bool _result) {
         CmcEnabled cmcEnabled = CmcEnabled(addr);
         // Don't add the contract if this does not work.
         if(!cmcEnabled.init(address(this), seniorName)) {
@@ -52,7 +52,7 @@ contract Cmc is CmcReader{
     }
 
     // Remove a contract from CMC. We could also selfdestruct if we want to.
-    function removeContract(bytes32 name) onlyOwner returns (bool result) {
+    function removeContract(bytes32 name) onlyOwner returns (bool _result) {
         if (contracts[name] == 0x0){
             return false;
         }
@@ -62,11 +62,11 @@ contract Cmc is CmcReader{
 
     function remove() onlyOwner {
         address dnsDb = contracts["dnsdb"];
-        address dnsManager = contracts["dnsmanager"];
+        address solDnsApp = contracts["soldnsapp"];
 
         // Remove everything.
         if(dnsDb != 0x0){ CmcEnabled(dnsDb).remove(); }
-        if(dnsManager != 0x0){ CmcEnabled(dnsManager).remove(); }
+        if(solDnsApp != 0x0){ CmcEnabled(solDnsApp).remove(); }
 
         selfdestruct(owner);
     }

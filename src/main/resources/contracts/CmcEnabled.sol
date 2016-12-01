@@ -1,4 +1,4 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.4;
 
 import "./Cmc.sol";
 
@@ -21,7 +21,6 @@ contract CmcEnabled {
         return true;
     }
 
-    // Makes it so that Doug is the only contract that may kill it.
     function remove(){
         if(cmcAddress == msg.sender){
             selfdestruct(cmcAddress);

@@ -8,7 +8,7 @@ public class CodeGenerator {
 
         System.out.println("Generate the code!");
 
-        create("DnsManager.sol", "DnsManager.abi");
+        create("SolDnsApp.sol", "SolDnsApp.abi");
         create("Cmc.sol", "Cmc.abi");
         create("DnsDB.sol", "DnsDB.abi");
     }

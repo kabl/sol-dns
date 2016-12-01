@@ -1,4 +1,4 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.4;
 
 import "./CmcEnabled.sol";
 
@@ -13,28 +13,29 @@ contract DnsDB is CmcEnabled {
      mapping (bytes32 => DnsEntry) dnsEntriesByName;
      event eventDnsDB_newEntry(bytes32 dnsName, bytes32 entry);
 
-     function register(bytes32 dnsName, bytes32 entry) callAllowed returns (bool success)  {
+     function register(bytes32 dnsName, bytes32 entry, address owner) callAllowed returns (bool _success)  {
 
-        dnsEntriesByName[dnsName] = DnsEntry(msg.sender, entry);
+        dnsEntriesByName[dnsName] = DnsEntry(owner, entry);
         eventDnsDB_newEntry(dnsName, entry);
 
-        success = true;
+        return true;
      }
 
-     function deleteEntryByName(bytes32 name) callAllowed returns (bool success) {
-        if(dnsEntriesByName[name].owner != address(0x0)){
-            delete dnsEntriesByName[name].owner;
-            delete dnsEntriesByName[name];
-            success = true;
-        }else{
-            success = false;
-        }
+     function deleteEntryByName(bytes32 dnsName) callAllowed returns (bool _success) {
+        delete dnsEntriesByName[dnsName].owner;
+        delete dnsEntriesByName[dnsName].entry;
+        delete dnsEntriesByName[dnsName];
+        return true;
      }
 
-     function getEntryByName(bytes32 name) callAllowed constant returns (bytes32 entry) {
-         if(dnsEntriesByName[name].owner != address(0x0))
-             return dnsEntriesByName[name].entry;
+     function getEntryByName(bytes32 dnsName) callAllowed constant returns (bytes32 _entry) {
+         if(dnsEntriesByName[dnsName].owner != address(0x0))
+             return dnsEntriesByName[dnsName].entry;
          else
              return "404";
+     }
+
+     function getOwnerByName(bytes32 dnsName) callAllowed constant returns (address _address){
+         return dnsEntriesByName[dnsName].owner;
      }
 }
